@@ -1,0 +1,44 @@
+import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { VitePWA } from 'vite-plugin-pwa';
+
+export default defineConfig({
+  plugins: [
+    svelte(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'TATETI',
+        short_name: 'TATETI',
+        description: 'Tic-tac-toe · field edition',
+        theme_color: '#a8ad7f',
+        background_color: '#a8ad7f',
+        display: 'standalone',
+        start_url: '/',
+        icons: [
+          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ttf,webp,svg,png}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\./,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+        ],
+      },
+    }),
+  ],
+  build: {
+    target: 'es2020',
+    cssMinify: true,
+    minify: 'esbuild',
+  },
+});
