@@ -1,5 +1,3 @@
-export const screen = $state({ current: 'home' });
-
 export const game = $state({
   mode: 'local',
   names: { X: 'JUGADOR 1', O: 'JUGADOR 2' },
@@ -11,7 +9,7 @@ export const game = $state({
   winningCombo: null,
 });
 
-export const room = $state({ code: '', isHost: false, status: 'idle' });
+export const room = $state({ code: '', isHost: false, status: 'idle', slot: null, error: null });
 
 export function resetBoard() {
   game.board = Array(9).fill(null);

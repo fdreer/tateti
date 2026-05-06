@@ -1,34 +1,47 @@
 <script>
   import Sysbar from '../components/Sysbar.svelte';
-  import { screen, room, game } from '../lib/state.svelte.js';
-  import { generateCode } from '../lib/gameLogic.js';
+  import { navigate } from '../lib/router.svelte.js';
   import { uppercase } from '../lib/actions.js';
+  import * as online from '../lib/online.svelte.js';
 
-  let playerName = $state('');
-  let joinCode = $state('');
-  let joinError = $state('');
+  let playerName  = $state('');
+  let joinCode    = $state('');
+  let joinError   = $state('');
+  let creating    = $state(false);
+  let joining     = $state(false);
 
-  function createRoom() {
+  async function createRoom() {
     const name = (playerName.trim() || 'JUGADOR').toUpperCase().slice(0, 12);
-    room.code = generateCode();
-    room.isHost = true;
-    room.status = 'waiting';
-    game.names = { X: name, O: '—' };
-    screen.current = 'waiting';
+    creating = true;
+    joinError = '';
+    try {
+      await online.createRoom(name);
+      navigate('/waiting');
+    } catch (err) {
+      joinError = err.message;
+    } finally {
+      creating = false;
+    }
   }
 
-  function joinRoom() {
+  async function joinRoom() {
     const code = joinCode.trim().toUpperCase();
     joinError = '';
-    if (code.length < 4) {
-      joinError = 'Ingresá un código válido';
-      return;
+    if (code.length < 4) { joinError = 'Ingresá un código válido'; return; }
+    const name = (playerName.trim() || 'JUGADOR').toUpperCase().slice(0, 12);
+    joining = true;
+    try {
+      await online.joinRoom(code, name);
+      navigate('/game');
+    } catch (err) {
+      joinError = err.message;
+    } finally {
+      joining = false;
     }
-    joinError = '// Modo online próximamente';
   }
 </script>
 
-<div class="device grain">
+<div class="device">
   <Sysbar left="TATETI v0.1" />
 
   <div class="brand-row" style="padding-bottom:0">
@@ -51,8 +64,8 @@
       />
     </div>
 
-    <button class="btn btn--primary btn--lg btn--block" onclick={createRoom}>
-      Crear sala →
+    <button class="btn btn--primary btn--lg btn--block" onclick={createRoom} disabled={creating || joining}>
+      {creating ? 'Creando…' : 'Crear sala →'}
     </button>
 
     <div class="or-divider">o</div>
@@ -76,14 +89,14 @@
       {/if}
     </div>
 
-    <button class="btn btn--ghost btn--lg btn--block" onclick={joinRoom}>
-      Unirme →
+    <button class="btn btn--ghost btn--lg btn--block" onclick={joinRoom} disabled={creating || joining}>
+      {joining ? 'Uniéndome…' : 'Unirme →'}
     </button>
 
     <button
       class="btn btn--ghost btn--block"
       style="color:var(--c-ink-soft)"
-      onclick={() => screen.current = 'home'}
+      onclick={() => navigate('/')}
     >← Volver</button>
   </div>
 </div>

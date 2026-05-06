@@ -32,3 +32,25 @@ export function generateCode() {
     chars[Math.floor(Math.random() * chars.length)]
   ).join('');
 }
+
+/**
+ * Pure move application — no side effects, no state mutation.
+ * @param {(string|null)[]} board
+ * @param {number} idx
+ * @param {'X'|'O'} current
+ */
+export function applyMove(board, idx, current) {
+  if (board[idx] !== null) return { ok: false, reason: 'occupied' };
+  const newBoard = [...board];
+  newBoard[idx] = current;
+  const winningCombo = checkWinner(newBoard);
+  const draw = !winningCombo && isDraw(newBoard);
+  return {
+    ok: true,
+    board: newBoard,
+    winningCombo,
+    over: !!winningCombo || draw,
+    nextTurn: (winningCombo || draw) ? current : (current === 'X' ? 'O' : 'X'),
+    result: winningCombo ? 'win' : draw ? 'draw' : null,
+  };
+}

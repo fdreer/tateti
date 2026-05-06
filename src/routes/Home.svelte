@@ -1,7 +1,8 @@
 <script>
   import Sysbar from '../components/Sysbar.svelte';
   import BrandRow from '../components/BrandRow.svelte';
-  import { screen, game, resetGame } from '../lib/state.svelte.js';
+  import { game, resetGame } from '../lib/state.svelte.js';
+  import { navigate } from '../lib/router.svelte.js';
   import { uppercase } from '../lib/actions.js';
 
   let playerName = $state('');
@@ -10,20 +11,20 @@
     const name = (playerName.trim() || 'JUGADOR 1').toUpperCase().slice(0, 12);
     game.names = { X: name, O: 'JUGADOR 2' };
     resetGame();
-    screen.current = 'game';
+    navigate('/game');
   }
 
   function goOnline() {
-    screen.current = 'online';
+    navigate('/online');
   }
 </script>
 
-<div class="device grain">
+<div class="device">
   <Sysbar />
 
-  <BrandRow />
-
   <div class="home-body">
+    <BrandRow />
+
     <div class="frame" style="padding: var(--s-3) var(--s-4)">
       <div class="label">Tu nombre</div>
       <input

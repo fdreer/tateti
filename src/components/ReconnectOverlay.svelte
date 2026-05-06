@@ -1,5 +1,5 @@
 <script>
-  import { screen } from '../lib/state.svelte.js';
+  import { navigate } from '../lib/router.svelte.js';
 
   let canAbandon = $state(false);
 
@@ -21,7 +21,7 @@
     <button
       class="btn btn--ghost btn--block"
       disabled={!canAbandon}
-      onclick={() => screen.current = 'home'}
+      onclick={() => navigate('/')}
     >Abandonar sala</button>
     {#if !canAbandon}
       <div class="xs muted" style="text-align:center;margin-top:8px">// Disponible en 30s</div>

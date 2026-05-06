@@ -2,10 +2,22 @@
   import Sysbar from '../components/Sysbar.svelte';
   import CodeDisplay from '../components/CodeDisplay.svelte';
   import Slot from '../components/Slot.svelte';
-  import { screen, room, game } from '../lib/state.svelte.js';
+  import { room, game } from '../lib/state.svelte.js';
+  import { navigate } from '../lib/router.svelte.js';
+  import * as online from '../lib/online.svelte.js';
+
+  // Navigate to /game once the subscription fires with status 'playing'
+  $effect(() => {
+    if (room.status === 'playing') navigate('/game');
+  });
+
+  function cancel() {
+    online.leaveRoom();
+    navigate('/');
+  }
 </script>
 
-<div class="device grain">
+<div class="device">
   <Sysbar left="SALA {room.code || '-----'}" connection="waiting" />
 
   <div class="brand-row" style="padding-bottom:0">
@@ -23,7 +35,7 @@
       </div>
     </div>
 
-    <button class="btn btn--ghost btn--block" onclick={() => screen.current = 'home'}>
+    <button class="btn btn--ghost btn--block" onclick={cancel}>
       Cancelar
     </button>
   </div>

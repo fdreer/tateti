@@ -1,8 +1,14 @@
 <script>
-  import { screen, game, nextRound } from '../lib/state.svelte.js';
+  import { game, nextRound } from '../lib/state.svelte.js';
+  import { navigate } from '../lib/router.svelte.js';
 
-  /** @type {{ result: 'win'|'draw', winnerName?: string }} */
-  let { result, winnerName = '' } = $props();
+  /** @type {{ result: 'win'|'draw', winnerName?: string, onNextRound?: () => void, onExit?: () => void }} */
+  let {
+    result,
+    winnerName  = '',
+    onNextRound = nextRound,
+    onExit      = () => navigate('/'),
+  } = $props();
 
   const scoreLine = $derived(
     `${game.names.X} ${game.scores.X} — ${game.scores.O} ${game.names.O}`
@@ -24,10 +30,10 @@
       Marcador: <strong>{scoreLine}</strong>
     </p>
     <div class="stack">
-      <button class="btn btn--primary btn--lg btn--block" onclick={nextRound}>
+      <button class="btn btn--primary btn--lg btn--block" onclick={onNextRound}>
         Jugar otra →
       </button>
-      <button class="btn btn--ghost btn--block" onclick={() => screen.current = 'home'}>
+      <button class="btn btn--ghost btn--block" onclick={onExit}>
         Salir
       </button>
     </div>
